@@ -16,6 +16,7 @@
     </style>
     <script>
         let excelData = {};
+        const defaultExcelUrl = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO/main/data.xlsx"; // Change to your actual file URL
         
         function saveDataToLocalStorage() {
             localStorage.setItem("excelData", JSON.stringify(excelData));
@@ -25,10 +26,38 @@
             const savedData = localStorage.getItem("excelData");
             if (savedData) {
                 excelData = JSON.parse(savedData);
+            } else {
+                loadDefaultExcel();
             }
         }
 
+        function loadDefaultExcel() {
+            fetch(defaultExcelUrl)
+                .then(response => response.arrayBuffer())
+                .then(data => {
+                    const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+                    
+                    excelData = {};
+                    for (let i = 1; i < sheet.length; i++) {
+                        let row = sheet[i];
+                        if (row.length > 1) {
+                            excelData[row[0].toString().trim()] = row.slice(1);
+                        }
+                    }
+                    saveDataToLocalStorage();
+                })
+                .catch(error => console.error("Error loading default Excel file:", error));
+        }
+
         function handleFileUpload(event) {
+            let password = prompt("Enter password to upload file:");
+            if (password !== "7590") {
+                alert("Incorrect password. Upload denied.");
+                return;
+            }
+
             const file = event.target.files[0];
             const reader = new FileReader();
             
@@ -71,7 +100,7 @@
 </head>
 <body>
     <h2>Excel Data Lookup</h2>
-    <label for="fileUpload">Upload Excel File:</label>
+    <label for="fileUpload">Upload Excel File (Admin Only):</label>
     <input type="file" id="fileUpload" accept=".xlsx" onchange="handleFileUpload(event)">
     <br><br>
     <label for="inputNumber">Enter No.:</label>
