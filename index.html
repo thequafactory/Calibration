@@ -17,6 +17,17 @@
         let excelData = {};
         const googleSheetUrl = "https://docs.google.com/spreadsheets/d/1E7uCTb7aJjlv6_cFU4r1dfZzNgP8SCTAxEkqAZ8PhVs/gviz/tq?tqx=out:json";
 
+        function saveDataToLocalStorage() {
+            localStorage.setItem("excelData", JSON.stringify(excelData));
+        }
+
+        function loadDataFromLocalStorage() {
+            const savedData = localStorage.getItem("excelData");
+            if (savedData) {
+                excelData = JSON.parse(savedData);
+            }
+        }
+
         function loadGoogleSheetData() {
             fetch(googleSheetUrl)
                 .then(response => response.text())
@@ -31,6 +42,7 @@
                             excelData[key] = row.c.slice(1).map(cell => (cell ? cell.v : ""));
                         }
                     });
+                    saveDataToLocalStorage();
                 })
                 .catch(error => console.error("Error fetching Google Sheets data:", error));
         }
@@ -50,7 +62,10 @@
         }
 
         window.onload = function() {
-            loadGoogleSheetData();
+            loadDataFromLocalStorage();
+            if (Object.keys(excelData).length === 0) {
+                loadGoogleSheetData();
+            }
         };
     </script>
 </head>
