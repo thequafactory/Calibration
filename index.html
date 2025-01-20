@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Excel Lookup</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        .output {
+            width: 100%;
+            min-width: 200px;
+            max-width: 600px;
+            padding: 5px;
+            font-size: 14px;
+            resize: both;
+            overflow: auto;
+        }
+    </style>
+    <script>
+        let excelData = {};
+        
+        function saveDataToLocalStorage() {
+            localStorage.setItem("excelData", JSON.stringify(excelData));
+        }
+
+        function loadDataFromLocalStorage() {
+            const savedData = localStorage.getItem("excelData");
+            if (savedData) {
+                excelData = JSON.parse(savedData);
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const sheet = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+                
+                excelData = {};
+                for (let i = 1; i < sheet.length; i++) {
+                    let row = sheet[i];
+                    if (row.length > 1) {
+                        excelData[row[0].toString().trim()] = row.slice(1);
+                    }
+                }
+                saveDataToLocalStorage();
+                alert("Excel data uploaded and saved successfully!");
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function lookupData() {
+            let inputNumber = document.getElementById("inputNumber").value.trim();
+            if (excelData.hasOwnProperty(inputNumber)) {
+                let outputFields = document.getElementsByClassName("output");
+                excelData[inputNumber].forEach((value, index) => {
+                    outputFields[index].value = value;
+                });
+            } else {
+                alert("Number not found in database");
+            }
+        }
+        
+        window.onload = function() {
+            loadDataFromLocalStorage();
+        };
+    </script>
+</head>
+<body>
+    <h2>Excel Data Lookup</h2>
+    <label for="fileUpload">Upload Excel File:</label>
+    <input type="file" id="fileUpload" accept=".xlsx" onchange="handleFileUpload(event)">
+    <br><br>
+    <label for="inputNumber">Enter No.:</label>
+    <input type="text" id="inputNumber">
+    <button onclick="lookupData()">Search</button>
+    <br><br>
+    <label>Line:</label> <input type="text" class="output" readonly><br>
+    <label>Location:</label> <input type="text" class="output" readonly><br>
+    <label>Description of Equipment:</label> <input type="text" class="output" readonly><br>
+    <label>Category of Device:</label> <input type="text" class="output" readonly><br>
+    <label>S/N Code:</label> <input type="text" class="output" readonly><br>
+    <label>Working Range:</label> <input type="text" class="output" readonly><br>
+    <label>Equipment Range:</label> <input type="text" class="output" readonly><br>
+    <label>Max Accepted Deviation:</label> <input type="text" class="output" readonly><br>
+    <label>Calibration Method:</label> <input type="text" class="output" readonly><br>
+    <label>Additional Info:</label> <input type="text" class="output" readonly><br>
+</body>
+</html>
