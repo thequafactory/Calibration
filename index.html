@@ -3,6 +3,29 @@
 <head>
     <title>Google Sheets Lookup</title>
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: purple;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header img {
+            height: 80px; /* Adjust height as needed */
+        }
+        .header img.right {
+            height: 120px; /* Increase size for the right image */
+        }
+        .content {
+            margin: 30px 20px 0 20px; /* Add space between header and input area with left and right margins */
+        }
+        .form-row {
+            margin-bottom: 15px; /* Add spacing between rows */
+        }
         .output {
             width: 100%;
             min-width: 200px;
@@ -16,17 +39,6 @@
     <script>
         let excelData = {};
         const googleSheetUrl = "https://docs.google.com/spreadsheets/d/1E7uCTb7aJjlv6_cFU4r1dfZzNgP8SCTAxEkqAZ8PhVs/gviz/tq?tqx=out:json";
-
-        function saveDataToLocalStorage() {
-            localStorage.setItem("excelData", JSON.stringify(excelData));
-        }
-
-        function loadDataFromLocalStorage() {
-            const savedData = localStorage.getItem("excelData");
-            if (savedData) {
-                excelData = JSON.parse(savedData);
-            }
-        }
 
         function loadGoogleSheetData() {
             fetch(googleSheetUrl)
@@ -42,7 +54,6 @@
                             excelData[key] = row.c.slice(1).map(cell => (cell ? cell.v : ""));
                         }
                     });
-                    saveDataToLocalStorage();
                 })
                 .catch(error => console.error("Error fetching Google Sheets data:", error));
         }
@@ -62,28 +73,65 @@
         }
 
         window.onload = function() {
-            loadDataFromLocalStorage();
-            if (Object.keys(excelData).length === 0) {
-                loadGoogleSheetData();
-            }
+            loadGoogleSheetData();
         };
     </script>
 </head>
 <body>
-    <h2>Google Sheets Data Lookup</h2>
-    <label for="inputNumber">Enter No.:</label>
-    <input type="text" id="inputNumber">
-    <button onclick="lookupData()">Search</button>
-    <br><br>
-    <label>Line:</label> <input type="text" class="output" readonly><br>
-    <label>Location:</label> <input type="text" class="output" readonly><br>
-    <label>Description of Equipment:</label> <input type="text" class="output" readonly><br>
-    <label>Category of Device:</label> <input type="text" class="output" readonly><br>
-    <label>S/N Code:</label> <input type="text" class="output" readonly><br>
-    <label>Working Range:</label> <input type="text" class="output" readonly><br>
-    <label>Equipment Range:</label> <input type="text" class="output" readonly><br>
-    <label>Max Accepted Deviation:</label> <input type="text" class="output" readonly><br>
-    <label>Calibration Method:</label> <input type="text" class="output" readonly><br>
-    <label>Additional Info:</label> <input type="text" class="output" readonly><br>
+    <div class="header">
+        <img src="MONDELEZ-Egypt-22474-1586438224.png" alt="Mondelez Logo">
+        <img src="silver-logo-2_orig.png" alt="Qualitech Logo" class="right">
+    </div>
+    
+    <div class="content">
+        <!-- Aligned Enter No. field -->
+        <div class="form-row">
+            <label for="inputNumber">Enter No.:</label>
+            <input type="text" id="inputNumber">
+            <button onclick="lookupData()">Search</button>
+        </div>
+        
+        <!-- Input and Output fields -->
+        <div class="form-row">
+            <label>Line:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Location:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Description of Equipment:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Category of Device:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>S/N Code:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Working Range:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Equipment Range:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Max Accepted Deviation:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Calibration Method:</label>
+            <input type="text" class="output" readonly>
+        </div>
+        <div class="form-row">
+            <label>Additional Info:</label>
+            <input type="text" class="output" readonly>
+        </div>
+    </div>
 </body>
 </html>
